@@ -40,6 +40,7 @@ mod unit_test_bug {
         #[ink(message)]
         pub fn flip_with_error(&mut self) -> Result<(), FlipError>{
             self.value = !self.value;
+            // Revert should occur and self.value remains unchanged
             Err(FlipError::FlipError)
         }
 
@@ -71,7 +72,9 @@ mod unit_test_bug {
         fn it_works() {
             let mut unit_test_bug = UnitTestBug::new(false);
             assert_eq!(unit_test_bug.get(), false);
+            // Error is returned, revert should occur, and value should remain as false
             assert_eq!(unit_test_bug.flip_with_error(), Err(FlipError::FlipError));
+            // This test is going to FAIL because the revert did not occur
             assert_eq!(unit_test_bug.get(), false);
         }
     }
