@@ -136,17 +136,19 @@ mod unit_test_bug {
 
             // When
             let flip = build_message::<UnitTestBugRef>(contract_account_id.clone())
-                .call(|unit_test_bug| unit_test_bug.flip());
+                .call(|unit_test_bug| unit_test_bug.flip_with_error());
+
+            // Call flip. Result should still be false as error is returned
             let _flip_result = client
                 .call(&ink_e2e::bob(), flip, 0, None)
-                .await
-                .expect("flip failed");
+                .await;
 
             // Then
             let get = build_message::<UnitTestBugRef>(contract_account_id.clone())
                 .call(|unit_test_bug| unit_test_bug.get());
             let get_result = client.call_dry_run(&ink_e2e::bob(), &get, 0, None).await;
-            assert!(matches!(get_result.return_value(), true));
+            // This test does pass properly in e2e tests
+            assert!(matches!(get_result.return_value(), false));
 
             Ok(())
         }
